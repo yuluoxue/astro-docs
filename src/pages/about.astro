@@ -5,13 +5,13 @@ import Footer from '../components/Footer.astro';
 const pageTitle = "关于我";
 
 const identity = {
-  firstName: "莎拉",
-  country: "加拿大",
-  occupation: "技术撰稿人",
-  hobbies: ["摄影", "观鸟", "棒球"],
+  firstName: "蔚洛雪",
+  country: "中国大陆",
+  occupation: "技术撰稿人，电力生产从事者",
+  hobbies: ["新技术", "游戏", ""],
 };
 
-const skills = ["HTML", "CSS", "JavaScript", "React", "Astro", "Writing Docs"];
+const skills = ["前端", "火电厂电力生产", "办公软件", "狗头军师", "Astro", "健身和训练教练"];
 
 const happy = true;
 const finished = true;
@@ -56,9 +56,6 @@ const skillColor = "purple";
 
     <Header />
 
-<h1>关于我</h1>
-<h2>……和我的新 Astro 网站！</h2>
-  <h1>我的 Astro 网站</h1>
     <h1>{pageTitle}</h1>
   <h2>……和我的新 Astro 网站！</h2>
 
@@ -81,9 +78,9 @@ const skillColor = "purple";
 
 {happy && <p>我非常乐意学习 Astro！</p>}
 
-{finished && <p>我完成了这节教程！</p>}
+{finished && <p>我正在路上！</p>}
 
-{goal === 3 ? <p>我的目标是在三天内完成。</p> : <p>我的目标不是 3 天。</p>}
+{goal === 3 ? <p>我的目标是在30天内完成。</p> : <p>我的目标不是 3 天。</p>}
 
   <Footer />
 

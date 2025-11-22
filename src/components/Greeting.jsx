@@ -10,7 +10,7 @@ export default function Greeting({messages}) {
     <div>
       <h3>{greeting}！感谢来访！</h3>
       <button onClick={() => setGreeting(randomMessage())}>
-        新的欢迎语
+        再来一条
       </button>
     </div>
   );
