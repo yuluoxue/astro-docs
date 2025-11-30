@@ -3,15 +3,32 @@ import Social from './Social.astro';
 ---
 
 <style>
-  footer {
-    display: flex;
-    gap: 1rem;
-    margin-top: 2rem;
-  }
+ footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+  .footer2 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.footer-split {
+  width: 100%;
+  margin: 0.5rem 0 0.5rem 0; /* 上下都留点空隙 */
+  border: none;
+  border-top: 1px solid #444; /* 颜色随自己风格调整 */
+}
+
 </style>
 
-
+<div>
+  <hr />
 <footer>
+
   <Social platform="twitter" username="astrodotbuild" />
   <Social platform="github" username="withastro" />
   <Social platform="youtube" username="astrodotbuild" />
@@ -19,5 +36,15 @@ import Social from './Social.astro';
   <Social platform="instagram" username="" />
   <Social platform="bilibili" username=" " />
   <Social platform="facebook" username="" />
-
 </footer>
+<footer class="footer2">
+  <Social platform="加入我们" />
+  <Social platform="联系我们" />
+  <Social platform="帮助与支持" />
+  <Social platform="隐私政策" />
+  <Social platform="使用条款" />
+</footer>
+
+<hr class="footer-split" />
+
+<span>版权所有 © 2025 蔚洛雪</span>

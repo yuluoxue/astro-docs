@@ -1,14 +1,59 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Greeting from '../components/Greeting';
-const pageTitle = "首页";
+const pageTitle = "";
 ---
+
 <BaseLayout pageTitle={pageTitle}>
-	<h2>……和我的新 Astro 网站！</h2>
-	
-  <h2>世界上一切问题总归有答案</h2>
+
+
+
+  	<div id="user-profile" class="greetings">
+<script type="text/javascript">
+var hello = "";
+var hour = new Date().getHours();
+// 获取问候语
+if (hour < 6) {
+    hello = "凌晨好！";
+} else if (hour < 9) {
+    hello = "早上好！";
+} else if (hour < 12) {
+    hello = "上午好！";
+} else if (hour < 14) {
+    hello = "中午好！ ";
+} else if (hour < 17) {
+    hello = "下午好！ ";
+} else if (hour < 19) {
+    hello = "傍晚好！";
+} else if (hour < 22) {
+    hello = "晚上好！ ";
+} else {
+    hello = "夜深了！ ";
+}
+document.write(hello);
+// 获取日期及星期
+var d, s = "";
+var x = new Array("星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六");
+d = new Date();
+s += d.getFullYear() + "年" + (d.getMonth() + 1) + "月" + d.getDate() + "日 ";
+s += x[d.getDay()];
+document.write(s);
+</script>
+</div>
+
+
+
+
+
+	<h2>欢迎各位</h2>
+
+  <h2>我想，世界上一切问题总归有答案</h2>
   <p>……除非你问的问题是个谜</p>
   
 
     <Greeting client:load messages={["Hej", "Hallo", "Hola", "Habari","日安", "欢迎", "你好", ]} />
+    <div>
+      <p>这是我的 Astro 学习网站的首页。在这里，我将分享我学习 Astro 的经历。</p
+></div>
+
 </BaseLayout>
