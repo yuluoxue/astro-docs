@@ -1,36 +1,85 @@
 ---
 import Header from '../components/Header.astro';
-import '../styles/global.css';
 import Footer from '../components/Footer.astro';
 import BlogPost from '../components/BlogPost.astro';
-const allPosts = Object.values(import.meta.glob('./posts/*.md', { eager: true }));
-const pageTitle = "关于我";
+import '../styles/global.css';
+
+// 递归加载 posts 下的所有 Markdown 文件，包括子文件夹
+const allPosts = Object.values(
+  import.meta.glob('./posts/**/*.md', { eager: true })
+);
+
+// 按发布日期排序（最新在前）
+allPosts.sort(
+  (a: any, b: any) => new Date(b.frontmatter.pubDate).getTime() - new Date(a.frontmatter.pubDate).getTime()
+);
+
+const pageTitle = "我的 Astro 学习博客";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width" />
+  <meta name="generator" content={Astro.generator} />
+  <title>{pageTitle}</title>
+</head>
 <body>
+  <Header />
 
-    <Header />
+  <h1>{pageTitle}</h1>
 
+  <!-- 搜索框 -->
+  <input 
+    type="text" 
+    id="searchInput" 
+    placeholder="搜索文章..." 
+    autocomplete="off"
+    style="margin-bottom:1rem; padding:0.5rem; width:100%; max-width:400px;" 
+  />
 
-  <h1>我的 Astro 学习博客</h1>
-      <ul>
-           {allPosts.map((post: any) => <BlogPost url={post.url} title={post.frontmatter.title} />)}
-    </ul>
+  <!-- 文章列表 -->
+  <ul id="postsList">
+    {allPosts.map((post: any) => (
+      <BlogPost
+        url={post.url}
+        title={post.frontmatter.title}
+        author={post.frontmatter.author}
+        date={post.frontmatter.pubDate}
+        description={post.frontmatter.description}
+        tags={post.frontmatter.tags}
+        thumbnail={post.frontmatter.thumbnail}
+      />
+    ))}
+  </ul>
+
   <p>在这里，我将分享我的 Astro 学习之旅。</p>
-    <Footer />
 
-     <script>
-   import "../scripts/menu.js";
- </script>
+  <Footer />
+
+  <script type="module">
+    import "../scripts/menu.js";
+
+    // 搜索功能
+    const searchInput = document.getElementById('searchInput');
+    const postsList = document.getElementById('postsList');
+    const posts = Array.from(postsList.querySelectorAll('li.blog-post'));
+
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.toLowerCase();
+      posts.forEach(post => {
+        const title = post.dataset.title?.toLowerCase() || '';
+        const description = post.dataset.description?.toLowerCase() || '';
+        const tags = post.dataset.tags?.toLowerCase() || '';
+        if (title.includes(query) || description.includes(query) || tags.includes(query)) {
+          post.style.display = '';
+        } else {
+          post.style.display = 'none';
+        }
+      });
+    });
+  </script>
+  
 </body>
 </html>

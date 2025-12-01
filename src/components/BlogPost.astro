@@ -1,4 +1,88 @@
 ---
-const { title, url } = Astro.props;
+const { url, title, author, date, description = '', tags = [], thumbnail } = Astro.props;
 ---
-<li><a href={url}>{title}</a></li>
+
+<li 
+  class="blog-post" 
+  data-title={title.toLowerCase()} 
+  data-description={description.toLowerCase()} 
+  data-tags={tags.join(' ').toLowerCase()}
+>
+  {thumbnail && <img src={thumbnail} alt={title} class="post-thumbnail" />}
+  <div class="post-info">
+    <a href={url}>{title}</a>
+    <div class="post-meta">
+      <span class="author">{author}</span> | 
+      <span class="date">{new Date(date).toLocaleDateString('zh-CN', { year:'numeric', month:'2-digit', day:'2-digit' })}</span>
+    </div>
+    {description && <p class="post-description">{description}</p>}
+    <div class="tags">
+      {tags.map(tag => (
+        <span class="tag">{tag}</span>
+      ))}
+    </div>
+  </div>
+</li>
+
+<style>
+.blog-post {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+
+.post-thumbnail {
+  width: 80px; /* 缩小宽度 */
+  height: 60px; /* 缩小高度 */
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.post-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.blog-post a {
+  font-weight: bold;
+  color: #0d0950;
+  text-decoration: none;
+}
+
+.blog-post a:hover {
+  text-decoration: underline;
+}
+
+.post-meta {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 0.2rem;
+}
+
+.post-description {
+  margin-top: 0.3rem;
+  font-size: 0.85rem;
+  color: #333;
+}
+
+.tags {
+  margin-top: 0.25rem;
+}
+
+.tag {
+  display: inline-block;
+  margin-right: 0.5rem;
+  font-size: 0.7rem;
+  background-color: #f0f0f0;
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+}
+
+/* 夜间模式 */
+html.dark .blog-post a { color: #76dfff; }
+html.dark .post-meta { color: #ccc; }
+html.dark .post-description { color: #ccc; }
+html.dark .tag { background-color: #2c2c2c; color: #fff; }
+</style>
