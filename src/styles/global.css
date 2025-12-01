@@ -164,7 +164,7 @@ html.dark .item a:hover {
   display: unset;
 }
 
-@media screen and (min-width: 636px) {
+@media screen and (min-width: 900px) {
   .nav-links {
     margin-left: 5em;
     display: block;
