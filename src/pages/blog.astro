@@ -14,7 +14,7 @@ allPosts.sort(
   (a: any, b: any) => new Date(b.frontmatter.pubDate).getTime() - new Date(a.frontmatter.pubDate).getTime()
 );
 
-const pageTitle = "我的 Astro 学习博客";
+const pageTitle = "学习日记";
 ---
 
 <html lang="zh-CN">
@@ -34,7 +34,7 @@ const pageTitle = "我的 Astro 学习博客";
   <input 
     type="text" 
     id="searchInput" 
-    placeholder="搜索文章..." 
+    placeholder="搜索内容..." 
     autocomplete="off"
     style="margin-bottom:1rem; padding:0.5rem; width:100%; max-width:400px;" 
   />
@@ -54,7 +54,7 @@ const pageTitle = "我的 Astro 学习博客";
     ))}
   </ul>
 
-  <p>在这里，我将分享我的 Astro 学习之旅。</p>
+  <p>在这里，我将分享我的心得。</p>
 
   <Footer />
 

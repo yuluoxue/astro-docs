@@ -7,11 +7,11 @@ const pageTitle = "关于我们";
 const identity = {
   firstName: "蔚洛雪",
   country: "中国大陆地区",
-  occupation: "技术撰稿人，电力生产从事者",
+  occupation: "电力生产从事者",
   hobbies: ["新技术", "游戏", ""],
 };
 
-const skills = ["前端", "火电厂电力生产", "办公软件","Astro", "健身和训练教练"];
+const skills = ["前端",  "办公软件","科技", "军事"];
 
 const happy = true;
 const finished = true;
@@ -57,12 +57,14 @@ const skillColor = "purple";
     <Header />
 
     <h1>{pageTitle}</h1>
-  <h2>……和我的新 Astro 网站！</h2>
+  <h2>欢迎访问 联邦第六特遣队 网站</h2>
 
-  <p>我正在学习 Astro 的入门教程。这是我网站上的第二个页面，也是我自己建立的第一页面！</p>
+  <p>这是我们的第一个网站。用来提供一些资料</p>
 
-  <p>随着我完成更多教程，该站点将更新，所以请继续查看我的旅程将如何进行吧！</p>
-<p>以下是关于我的几个事实：</p>
+  <p>随着网站更新，我们会提供更多的资料和信息以及服务。</p>
+  <p> 联邦第六特遣队负责阻止可能的跨国威胁并切断威胁国家的通道。 威胁包括国际恐怖主义，毒品贩运，外国人走私，大规模毁灭性武器以及威胁联邦安全 部队作战内容除去本土外还存在在海外作战猎杀高价值目标，或联合其他部队一同进攻目标单位。部队拥有海陆空一体化作战能力。 </p>
+  
+<p>以下是关于我个人的几个事实：</p>
 <ul>
   <li>我的名字是{identity.firstName}.</li>
   <li>我住在{identity.country}。我的职业是{identity.occupation}。</li>
@@ -76,11 +78,11 @@ const skillColor = "purple";
 </ul>
 
 
-{happy && <p>我非常乐意学习 Astro！</p>}
+{happy && <p>为何要建立这个网站！</p>}
 
-{finished && <p>我正在路上！</p>}
+{finished && <p>我正在路上！以实践代替学习</p>}
 
-{goal === 3 ? <p>我的目标是在30天内完成。</p> : <p>我的目标不是 3 天。</p>}
+{goal === 3 ? <p>我的目标是在2026年内完成。</p> : <p>我的目标不是 3 天。</p>}
 
   <Footer />
 
