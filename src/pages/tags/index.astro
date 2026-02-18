@@ -1,34 +1,53 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-const allPosts = Object.values(import.meta.glob('../posts/*.md', { eager: true }));
-const tags = [...new Set(allPosts.map((post: any) => post.frontmatter.tags).flat())];
+import { getCollection } from "astro:content";
+
 const pageTitle = "标签索引";
 
+/* 获取文章集合 */
+const posts = await getCollection("posts");
+
+/* 过滤草稿 */
+const publishedPosts = posts.filter(post => !post.data.draft);
+
+/* 提取所有标签 */
+const tags = [
+  ...new Set(
+    publishedPosts.flatMap(post => post.data.tags || [])
+  )
+].sort();
 ---
-<title>标签索引</title>
+
 <BaseLayout pageTitle={pageTitle}>
-  <div class="tags">
-    {tags.map((tag) => (
-      <p class="tag"><a href={`/tags/${tag}`}>{tag}</a></p>
-    ))}
-  </div>
+
+<h1>{pageTitle}</h1>
+
+<div class="tags">
+  {tags.map(tag => (
+    <p class="tag">
+      <a href={`/tags/${tag}/`}>{tag}</a>
+    </p>
+  ))}
+</div>
+
 </BaseLayout>
+
 <style>
-  a {
-    color: #00539F;
-  }
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
 
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
-  }
+.tag {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+}
 
-  .tag {
-    margin: 0.25em;
-    border: dotted 1px #a1a1a1;
-    border-radius: .5em;
-    padding: .5em 1em;
-    font-size: 1.15em;
-    background-color: #F8FCFD;
-  }
+.tag a {
+  text-decoration: none;
+  color: var(--text-main);
+}
 </style>

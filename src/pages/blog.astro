@@ -1,85 +1,73 @@
 ---
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import BlogPost from '../components/BlogPost.astro';
-import '../styles/global.css';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from "astro:content";
 
-// 递归加载 posts 下的所有 Markdown 文件，包括子文件夹
-const allPosts = Object.values(
-  import.meta.glob('./posts/**/*.md', { eager: true })
-);
+const pageTitle = "技术档案";
 
-// 按发布日期排序（最新在前）
-allPosts.sort(
-  (a: any, b: any) => new Date(b.frontmatter.pubDate).getTime() - new Date(a.frontmatter.pubDate).getTime()
-);
+/* 读取文章集合 */
+const posts = await getCollection("posts");
 
-const pageTitle = "学习日记";
+/* 过滤草稿 + 排序 */
+const publishedPosts = posts
+  .filter(post => !post.data.draft)
+  .sort((a, b) =>
+    b.data.pubDate.getTime() -
+    a.data.pubDate.getTime()
+  );
 ---
 
-<html lang="zh-CN">
-<head>
-  <meta charset="utf-8" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <meta name="viewport" content="width=device-width" />
-  <meta name="generator" content={Astro.generator} />
-  <title>{pageTitle}</title>
-</head>
-<body>
-  <Header />
+<BaseLayout pageTitle={pageTitle}>
 
-  <h1>{pageTitle}</h1>
+<h1>{pageTitle}</h1>
 
-  <!-- 搜索框 -->
-  <input 
-    type="text" 
-    id="searchInput" 
-    placeholder="搜索内容..." 
-    autocomplete="off"
-    style="margin-bottom:1rem; padding:0.5rem; width:100%; max-width:400px;" 
-  />
+<input
+  type="text"
+  id="searchInput"
+  placeholder="搜索内容..."
+  autocomplete="off"
+  class="search-input"
+/>
 
-  <!-- 文章列表 -->
-  <ul id="postsList">
-    {allPosts.map((post: any) => (
-      <BlogPost
-        url={post.url}
-        title={post.frontmatter.title}
-        author={post.frontmatter.author}
-        date={post.frontmatter.pubDate}
-        description={post.frontmatter.description}
-        tags={post.frontmatter.tags}
-        thumbnail={post.frontmatter.thumbnail}
-      />
-    ))}
-  </ul>
+<ul id="postsList" class="post-list">
+  {publishedPosts.map(post => (
+    <li
+      class="blog-post"
+      data-title={post.data.title}
+      data-description={post.data.description}
+      data-tags={(post.data.tags || []).join(",")}
+    >
+      <a href={`/posts/${post.slug}/`}>
+        <h3>{post.data.title}</h3>
+        <p>{post.data.pubDate.toISOString().split('T')[0]}</p>
+        <p>{post.data.description}</p>
+      </a>
+    </li>
+  ))}
+</ul>
 
-  <p>在这里，我将分享我的心得。</p>
+<script>
+  const searchInput = document.getElementById('searchInput');
+  const postsList = document.getElementById('postsList');
+  const posts = Array.from(postsList.querySelectorAll('li.blog-post'));
 
-  <Footer />
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.toLowerCase();
+    posts.forEach(post => {
+      const title = post.dataset.title?.toLowerCase() || '';
+      const description = post.dataset.description?.toLowerCase() || '';
+      const tags = post.dataset.tags?.toLowerCase() || '';
 
-  <script type="module">
-    import "../scripts/menu.js";
-
-    // 搜索功能
-    const searchInput = document.getElementById('searchInput');
-    const postsList = document.getElementById('postsList');
-    const posts = Array.from(postsList.querySelectorAll('li.blog-post'));
-
-    searchInput.addEventListener('input', () => {
-      const query = searchInput.value.toLowerCase();
-      posts.forEach(post => {
-        const title = post.dataset.title?.toLowerCase() || '';
-        const description = post.dataset.description?.toLowerCase() || '';
-        const tags = post.dataset.tags?.toLowerCase() || '';
-        if (title.includes(query) || description.includes(query) || tags.includes(query)) {
-          post.style.display = '';
-        } else {
-          post.style.display = 'none';
-        }
-      });
+      if (
+        title.includes(query) ||
+        description.includes(query) ||
+        tags.includes(query)
+      ) {
+        post.style.display = '';
+      } else {
+        post.style.display = 'none';
+      }
     });
-  </script>
-  
-</body>
-</html>
+  });
+</script>
+
+</BaseLayout>

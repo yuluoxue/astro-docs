@@ -1,0 +1,102 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from "astro:content";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("posts");
+
+  const categories = [...new Set(
+    posts.map(p => p.data.category).filter(Boolean)
+  )];
+
+  return categories.map(category => ({
+    params: { category }
+  }));
+}
+
+const { category } = Astro.params;
+
+const posts = await getCollection("posts");
+
+const filteredPosts = posts
+  .filter(p => p.data.category === category)
+  .sort((a,b)=> b.data.pubDate.getTime() - a.data.pubDate.getTime());
+
+const categoryMap = {
+  dev: "开发环境",
+  tools: "工具链",
+  docs: "学习来源",
+  lab: "实验区"
+};
+---
+
+<BaseLayout pageTitle={categoryMap[category] ?? category}>
+
+<section class="category-hero">
+  <h1>{categoryMap[category] ?? category}</h1>
+  <p>该分类下的技术档案</p>
+</section>
+
+<section class="category-list">
+  {filteredPosts.map(post => (
+    <a href={`/posts/${post.slug}/`} class="category-card">
+      <h3>{post.data.title}</h3>
+      <p class="meta">
+        {post.data.pubDate.toISOString().split("T")[0]}
+      </p>
+      {post.data.summary && (
+        <p class="summary">{post.data.summary}</p>
+      )}
+    </a>
+  ))}
+</section>
+
+</BaseLayout>
+
+<style>
+.category-hero {
+  margin: 40px 0 30px;
+}
+
+.category-hero h1 {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.category-hero p {
+  color: var(--text-secondary);
+}
+
+.category-list {
+  display: grid;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.category-card {
+  display: block;
+  padding: 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--text-main);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0,0,0,.08);
+}
+
+.meta {
+  font-size: .85rem;
+  color: var(--text-secondary);
+  margin: 6px 0;
+}
+
+.summary {
+  font-size: .9rem;
+  color: var(--text-secondary);
+}
+</style>
