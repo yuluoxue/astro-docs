@@ -1,7 +1,7 @@
 ---
 title: "我的第四篇博客文章"
 description: "这篇文章会自动出现在列表中"
-pubDate: 2026-02-01
+pubDate: 2024-01-01
 author: "蔚洛雪"
 category: lab
 tags:

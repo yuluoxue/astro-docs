@@ -1,20 +1,45 @@
 ---
 import { getCollection } from "astro:content";
-import BaseLayout from "../../layouts/BaseLayout.astro";
+import MarkdownPostLayout from "../../layouts/MarkdownPostLayout.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("posts");
 
-  return posts.map(post => ({
+  const publishedPosts = posts
+    .filter(post => !post.data.draft)
+    .sort((a, b) =>
+      a.data.pubDate.getTime() - b.data.pubDate.getTime()
+    );
+
+  return publishedPosts.map((post, index) => ({
     params: { slug: post.slug },
-    props: { post }
+    props: {
+      post,
+      prev: publishedPosts[index - 1] || null,
+      next: publishedPosts[index + 1] || null
+    }
   }));
 }
 
-const { post } = Astro.props;
-const { Content } = await post.render();
+const { post, prev, next } = Astro.props;
+
+const { Content, headings } = await post.render();
+
+const h2Headings = headings.filter(h => h.depth === 2);
+
+/* 字数统计 */
+const rawContent = post.body || "";
+const wordCount = rawContent.length;
+const readingTime = Math.max(1, Math.ceil(wordCount / 450));
 ---
 
-<BaseLayout pageTitle={post.data.title}>
+<MarkdownPostLayout
+  frontmatter={post.data}
+  wordCount={wordCount}
+  readingTime={readingTime}
+  prev={prev}
+  next={next}
+  headings={h2Headings}
+>
   <Content />
-</BaseLayout>
+</MarkdownPostLayout>

@@ -1,39 +1,469 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-const { frontmatter } = Astro.props;
+import { getPostStatus } from "../core/lifecycle";
+
+const {
+  frontmatter,
+  prev,
+  next,
+  headings
+} = Astro.props;
+
+
+const status = getPostStatus({
+  pubDate: frontmatter.pubDate,
+  timeless: frontmatter.timeless,
+  validDays: frontmatter.validDays,
+});
+
+
+
 ---
+
 <BaseLayout pageTitle={frontmatter.title}>
-  <p><em>{frontmatter.description}</em></p>
-  <p>{frontmatter.pubDate.toString().slice(0,10)}</p>
 
-  <p>作者：{frontmatter.author}</p>
 
-  <img src={frontmatter.image.url} width="300" alt={frontmatter.image.alt} />
 
-  <div class="tags">
-    {frontmatter.tags.map((tag: string) => (
-      <p class="tag"><a href={`/tags/${tag}`}>{tag}</a></p>
-    ))}
+<div class="post-grid">
+
+  <!-- 左侧目录 -->
+  <aside class="post-toc">
+    <div class="toc-inner">
+
+      <div class="toc-title">本页目录</div>
+
+      <ul class="toc-list">
+        {headings.map(h => (
+          <li class={`toc-item depth-${h.depth}`}>
+            <a href={`#${h.slug}`} class="toc-link">
+              {h.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+
+    </div>
+  </aside>
+
+  <!-- 右侧正文 -->
+  <article class="post-container">
+
+  <h1 class="post-title">
+    {frontmatter.title}
+  </h1>
+
+  {frontmatter.description && (
+    <p class="post-description">
+      {frontmatter.description}
+    </p>
+  )}
+
+  <div class="post-meta">
+    {frontmatter.pubDate.toISOString().split('T')[0]}
+    {frontmatter.author && ` · ${frontmatter.author}`}
+    · 📝 {Astro.props.wordCount} 字
+    · ⏱ {Astro.props.readingTime} 分钟
   </div>
 
-  <slot />
+  {status === "warn" && (
+    <div class="lifecycle-bar warn">
+      本文发布已超过一年，部分内容可能与当前环境存在差异。
+    </div>
+  )}
+
+  {status === "expired" && (
+    <div class="lifecycle-bar expired">
+      本文已超过有效期限，部分内容可能不再适用。
+    </div>
+  )}
+
+  {frontmatter.cover && (
+    <div class="post-cover">
+      <img src={frontmatter.cover} alt={frontmatter.title} />
+    </div>
+  )}
+
+  <section class="post-content">
+   
+
+    <slot />
+  </section>
+
+</article>
+ 
+</div>
 </BaseLayout>
+
+
 <style>
-  a {
-    color: #00539F;
+
+
+.post-container {
+  max-width: 780px;   /* 稍微再窄一点，阅读更舒服 */
+  margin: 0 auto;
+  padding: 60px 24px;
+}
+
+.post-header {
+  margin-bottom: 30px;
+}
+
+
+.post-title {
+  margin-bottom: 16px;
+}
+.post-description {
+  font-style: italic;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.post-meta {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.meta-divider {
+  margin-left: 6px;
+}
+
+.lifecycle-bar {
+  margin: 20px 0;
+  padding: 14px 18px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.lifecycle-bar.warn {
+  background: #fff4d6;
+  border: 1px solid #facc15;
+  color: #92400e;
+}
+
+.lifecycle-bar.expired {
+  background: #ffe4e6;
+  border: 1px solid #ef4444;
+  color: #7f1d1d;
+}
+
+.post-cover {
+  margin-top: 20px;
+}
+
+.post-cover img {
+  width: 100%;
+  max-height: 420px;
+  object-fit: cover;
+  border-radius: 14px;
+  margin-bottom: 30px;
+}
+
+.post-content {
+  line-height: 1.8;
+  margin-top: 30px;
+}
+
+#reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: var(--primary);
+  z-index: 9999;
+  transition: width 0.1s ease-out;
+}
+
+
+.post-navigation {
+  margin-top: 60px;
+  padding-top: 30px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.post-navigation a {
+  text-decoration: none;
+  color: var(--primary);
+  font-weight: 500;
+  transition: opacity 0.2s ease;
+}
+
+.post-navigation a:hover {
+  opacity: 0.7;
+}
+.post-pagination {
+  margin-top: 60px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.page-pill {
+  flex: 1;
+  min-width: 240px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  padding: 16px 20px;
+  border-radius: 999px;
+
+  text-decoration: none;
+  background: var(--container-bg);
+  border: 1px solid var(--border);
+
+  transition: all 0.2s ease;
+}
+
+.page-pill small {
+  display: block;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.page-pill strong {
+  display: block;
+  font-size: 14px;
+  color: var(--text-main);
+  margin-top: 2px;
+}
+
+.page-pill .arrow {
+  font-size: 18px;
+  opacity: 0.6;
+}
+
+.page-pill:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  border-color: var(--primary);
+}
+
+.prev {
+  text-align: left;
+}
+
+.next {
+  text-align: right;
+}
+
+
+
+
+.post-grid {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* 目录整体 */
+.post-toc {
+  position: sticky;
+  top: 120px;
+  height: fit-content;
+}
+
+/* 胶囊容器 */
+.toc-inner {
+  background: var(--container-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 18px;
+}
+
+/* 标题 */
+.toc-title {
+  font-weight: 600;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+/* 列表 */
+.toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.toc-item {
+  margin-bottom: 10px;
+}
+
+.toc-link {
+  text-decoration: none;
+  color: var(--text-main);
+  padding: 6px 12px;
+  border-radius: 999px;
+  display: inline-block;
+  transition: background 0.2s ease;
+}
+
+.toc-link:hover {
+  background: rgba(61,169,252,0.15);
+}
+
+/* 移动端隐藏目录 */
+@media (max-width: 900px) {
+  .post-grid {
+    display: block;
   }
 
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
+  .post-toc {
+    display: none;
   }
+}
 
-  .tag {
-    margin: 0.25em;
-    border: dotted 1px #a1a1a1;
-    border-radius: .5em;
-    padding: .5em 1em;
-    font-size: 1.15em;
-    background-color: #F8FCFD;
-  }
+.toc-link {
+  display: block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.toc-link.active {
+  background: red !important;
+  color: white !important;
+}
+
+.post-content h1,
+.post-content h2 {
+  margin-top: 0;
+  padding-top: 40px;        /* 视觉间距 */
+
+}
+
+.post-meta {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+.post-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.post-grid {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+
+
+
 </style>
+
+<script is:inline>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const progressBar = document.getElementById("reading-progress");
+  const article = document.querySelector(".post-content");
+
+  if (!progressBar || !article) return;
+
+  function updateProgress() {
+
+    const articleTop = article.offsetTop;
+    const articleHeight = article.scrollHeight;
+    const scrollY = window.scrollY;
+
+    const start = articleTop;
+    const end = articleTop + articleHeight - window.innerHeight;
+
+    let progress = (scrollY - start) / (end - start);
+    progress = Math.min(Math.max(progress, 0), 1);
+
+    progressBar.style.width = progress * 100 + "%";
+  }
+
+  window.addEventListener("scroll", updateProgress);
+  window.addEventListener("resize", updateProgress);
+
+  updateProgress();
+
+});
+</script>
+<script is:inline>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const links = Array.from(document.querySelectorAll(".toc-link"));
+  const headings = Array.from(document.querySelectorAll(".post-content h1, .post-content h2"));
+  const header = document.querySelector(".site-header");
+
+  if (!links.length || !headings.length || !header) return;
+
+  const headerHeight = header.getBoundingClientRect().height;
+  const extraOffset = 21.6; // 三行视觉补偿，可微调
+
+  // ===== 点击目录平滑滚动 =====
+  links.forEach(link => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      const id = decodeURIComponent(link.hash.slice(1));
+      const target = document.getElementById(id);
+      if (!target) return;
+
+      const y =
+        target.getBoundingClientRect().top +
+        window.scrollY -
+        headerHeight -
+        extraOffset;
+
+      window.scrollTo({
+        top: y,
+        behavior: "smooth"
+      });
+    });
+  });
+
+  // ===== 目录高亮逻辑 =====
+function updateActive() {
+
+  const activeLine = headerHeight + extraOffset;
+
+  let current = headings[0];
+
+  for (let i = 0; i < headings.length; i++) {
+    const rect = headings[i].getBoundingClientRect();
+
+    if (rect.top - activeLine <= 0) {
+      current = headings[i];
+    } else {
+      break;
+    }
+  }
+
+  // 触底强制选最后一个
+  if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 10) {
+    current = headings[headings.length - 1];
+  }
+
+  links.forEach(link => {
+    const targetId = decodeURIComponent(link.hash.slice(1));
+    link.classList.toggle("active", targetId === current.id);
+  });
+}
+
+window.addEventListener("scroll", updateActive);
+window.addEventListener("resize", updateActive);
+window.addEventListener("load", updateActive);
+
+updateActive();
+
+});
+</script>

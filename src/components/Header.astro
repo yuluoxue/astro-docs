@@ -4,22 +4,48 @@ import Navigation from './Navigation.astro';
 import ThemeIcon from './ThemeIcon.astro';
 ---
 
-<header>
- <nav>
-   <div>
-     <ThemeIcon />
-     <Menu />
-   </div>
-   <Navigation />
- </nav>
+<header class="site-header">
+
+  <nav class="nav-container">
+
+    <div class="nav-top">
+      <ThemeIcon />
+      <Menu />
+    </div>
+
+    <Navigation />
+
+  </nav>
+
+  <!-- 阅读进度条 -->
+  <div id="reading-progress"></div>
+
 </header>
 
 <style>
- div {
-   display: flex;
-   justify-content: space-between;
- }
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--container-bg);
+  border-bottom: 1px solid var(--border);
+}
+
+/* 只控制这一层，不污染全局 */
+.nav-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 进度条贴菜单下沿 */
+#reading-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: var(--primary);
+  transition: width 0.1s ease-out;
+}
 </style>
-
-
-

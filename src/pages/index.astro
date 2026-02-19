@@ -2,6 +2,8 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from "astro:content";
 import { getUpdateStatus } from "../core/system";
+import { getPostStatus
+ } from "../core/lifecycle";
 
 
 const pageTitle = "系统首页";
@@ -52,7 +54,7 @@ const totalTags = new Set(
   publishedPosts.flatMap(p => p.data.tags || [])
 ).size;
 
-const systemStartDate = new Date("2026-02-01");
+const systemStartDate = new Date("2026-03-01");
 
 const runningDays = Math.floor(
   (Date.now() - systemStartDate.getTime()) /
@@ -75,7 +77,7 @@ const updateStatus = getUpdateStatus(latestPostDate);
 </section>
 
 <!-- 资源入口 -->
-<div class="resource-grid">
+<div class="grid-auto">
   <a href="/resources/dev/" class="resource-card">
     <h3>开发环境</h3>
     <p>Astro · Markdown · 本地构建</p>
@@ -97,28 +99,28 @@ const updateStatus = getUpdateStatus(latestPostDate);
   </a>
 </div>
 
-<!-- 状态栏 -->
-<section class="status-bar">
-<div class="status-item">
-  <span class="label">最后同步</span>
-  <span class="value update-value">
-    {lastUpdated}
+<!-- 最后同步 -->
+<section class="last-sync">
+  <div class="sync-box">
+    <span class="sync-label">最后同步</span>
+    <span class="sync-time">{lastUpdated}</span>
 
     {updateStatus === "new" && (
       <span class="badge new">NEW</span>
     )}
 
-    {updateStatus === "error" && (
-      <span class="badge error">时间异常</span>
-    )}
-
     {updateStatus === "warn" && (
       <span class="badge warn">180天未更新</span>
     )}
-  </span>
-</div>
 
-<!-- 统计 -->
+    {updateStatus === "error" && (
+      <span class="badge error">时间异常</span>
+    )}
+  </div>
+</section>
+
+
+
 <section class="stats-bar">
   <div class="stat-item">
     <span class="stat-value">{totalPosts}</span>
@@ -139,31 +141,62 @@ const updateStatus = getUpdateStatus(latestPostDate);
 <!-- 最近更新 -->
 <section>
   <h2>最近更新</h2>
-  <div class="post-list">
-    {recentPosts.map(post => (
-      <a href={`/posts/${post.slug}/`} class="post-item">
-        <h3>{post.data.title}</h3>
-        <p class="meta">
+
+  <div class="post-grid">
+{recentPosts.map(post => {
+  const status = getPostStatus(post.data);
+
+  return (
+    <article class="post-card">
+      <a href={`/posts/${post.slug}/`}>
+        <h3 class="post-title">
+          {post.data.title}
+
+          {status === "new" && (
+            <span class="badge new">新</span>
+          )}
+
+          {status === "warn" && (
+            <span class="badge warn">注意</span>
+          )}
+
+          {status === "expired" && (
+            <span class="badge error">过期</span>
+          )}
+        </h3>
+
+        <p class="post-date">
           {post.data.pubDate.toISOString().split('T')[0]}
         </p>
       </a>
-    ))}
+    </article>
+  );
+})}
+
   </div>
+
 </section>
 
 <!-- 精选 -->
 <section class="featured-section">
   <h2>精选技术档案</h2>
-  <div class="featured-grid">
+
+  <div class="grid-auto">
     {featuredPosts.map(post => (
-      <a href={`/posts/${post.slug}/`} class="featured-item">
-        <h3>{post.data.title}</h3>
-        <p class="featured-summary">
-          {post.data.summary ?? "暂无摘要"}
-        </p>
-      </a>
+      <article class="post-card">
+        <a href={`/posts/${post.slug}/`}>
+          <h3 class="post-title">
+            {post.data.title}
+          </h3>
+
+          <p class="post-desc">
+            {post.data.summary ?? "暂无摘要"}
+          </p>
+        </a>
+      </article>
     ))}
   </div>
+
 </section>
 
 </BaseLayout>
@@ -214,29 +247,8 @@ const updateStatus = getUpdateStatus(latestPostDate);
 }
 
 /* 状态行 */
-.status-bar {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-  padding: 24px 0;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-}
 
 
-
-.status-item .label {
-  display: block;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  margin-bottom: 6px;
-}
-
-.status-item .value {
-  font-weight: 600;
-  font-size: 1.05rem;
-  color: var(--text-main);
-}
 
 /* 文章列表 */
 .post-list {
@@ -245,24 +257,6 @@ const updateStatus = getUpdateStatus(latestPostDate);
   margin-top: 16px;
 }
 
-.post-item {
-  padding: 16px;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  text-decoration: none;
-  color: var(--text-main);
-  transition: background 0.2s ease;
-}
-
-.post-item:hover {
-  background: var(--container-bg);
-}
-
-.meta {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-}
 
 /* 五年计划区 */
 .plan {
@@ -292,31 +286,6 @@ const updateStatus = getUpdateStatus(latestPostDate);
   align-items: center;
   gap: 8px;
 }
-/*呼吸灯*/
-.status-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  animation: pulse 2.2s infinite ease-in-out;
-}
-
-/* 正常 */
-.status-dot.ok {
-  background-color: #22c55e;
-  --glow: rgba(34,197,94,0.6);
-}
-
-/* 警告 */
-.status-dot.warn {
-  background-color: #f59e0b;
-  --glow: rgba(245,158,11,0.6);
-}
-
-/* 错误 */
-.status-dot.error {
-  background-color: #ef4444;
-  --glow: rgba(239,68,68,0.6);
-}
 
 @keyframes pulse {
   0% {
@@ -328,16 +297,6 @@ const updateStatus = getUpdateStatus(latestPostDate);
   100% {
     box-shadow: 0 0 0 0 rgba(0,0,0,0);
   }
-}
-.badge-new {
-  margin-left: 8px;
-  font-size: 0.65rem;
-  padding: 2px 6px;
-  border-radius: 3px;
-
-  border: 1px solid var(--primary);
-  color: var(--primary);
-  background: rgba(0, 0, 0, 0.02);
 }
 
 .featured-section {
@@ -355,44 +314,11 @@ const updateStatus = getUpdateStatus(latestPostDate);
   margin-top: 20px;
 }
 
-.featured-item {
-  padding: 20px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--container-bg);
-  text-decoration: none;
-  color: var(--text-main);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.featured-item:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-}
 
 .featured-summary {
   margin-top: 8px;
   font-size: 0.9rem;
   color: var(--text-secondary);
-}
-.status-bar {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-  padding: 24px 0;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-}
-
-.status-item {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px 20px;
-  display: flex;
-  flex-direction: column;
-
-  align-self: start;     /* 关键：不要被 grid 拉高 */
 }
 
 
@@ -408,50 +334,21 @@ const updateStatus = getUpdateStatus(latestPostDate);
   font-weight: 600;
   font-size: 1rem;
 }
+
 @media (max-width: 900px) {
-  .status-bar {
+  .stats-bar {
     grid-template-columns: 1fr;
   }
 }
-.status-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-right: 6px;
-}
 
-.status-dot.ok {
-  background-color: #22c55e;
-}
 
-.status-dot.warn {
-  background-color: #f59e0b;
-}
-
-.status-dot.error {
-  background-color: #ef4444;
-}
-.status-item.warning {
-  border-color: #f59e0b;
-}
-
-.status-item.warning .value {
-  color: #f59e0b;
-  font-weight: 600;
-}
 section h2 {
   margin-bottom: 20px;
 }
-.post-item {
-  transition: transform 0.15s ease;
-}
 
-.post-item:hover {
-  transform: translateY(-2px);
-}
 .resource-section {
   margin-top: 70px;
+   margin-bottom: 40px;
 }
 
 .resource-grid {
@@ -490,26 +387,32 @@ section h2 {
   gap: 8px;
 }
 
-.badge {
-  padding: 2px 6px;
-  font-size: 12px;
-  border-radius: 4px;
+
+.last-sync {
+  margin: 40px 0 50px 0;
+  display: flex;
+  justify-content: center;
 }
 
-.badge.new {
-  background: #22c55e;
-  color: white;
+.sync-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 18px;
+  border-radius: 999px; /* 胶囊形 */
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
 }
 
-.badge.warn {
-  background: #f59e0b;
-  color: white;
+.sync-label {
+  color: var(--text-secondary);
 }
 
-.badge.error {
-  background: #ef4444;
-  color: white;
+.sync-time {
+  font-weight: 500;
 }
+
 
 </style>
 

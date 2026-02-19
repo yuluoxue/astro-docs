@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from "astro:content";
+import { getPostStatus } from "../core/lifecycle";
 
 const pageTitle = "技术档案";
 
@@ -18,40 +19,84 @@ const publishedPosts = posts
 
 <BaseLayout pageTitle={pageTitle}>
 
-<h1>{pageTitle}</h1>
+<section class="archive-container">
 
-<input
-  type="text"
-  id="searchInput"
-  placeholder="搜索内容..."
-  autocomplete="off"
-  class="search-input"
-/>
+  <h1 class="page-title">{pageTitle}</h1>
 
-<ul id="postsList" class="post-list">
-  {publishedPosts.map(post => (
-    <li
-      class="blog-post"
-      data-title={post.data.title}
-      data-description={post.data.description}
-      data-tags={(post.data.tags || []).join(",")}
-    >
-      <a href={`/posts/${post.slug}/`}>
-        <h3>{post.data.title}</h3>
-        <p>{post.data.pubDate.toISOString().split('T')[0]}</p>
-        <p>{post.data.description}</p>
-      </a>
-    </li>
-  ))}
-</ul>
+  <input
+    type="text"
+    id="searchInput"
+    placeholder="搜索标题 / 描述 / 标签..."
+    autocomplete="off"
+    class="search-input"
+  />
+<div id="postsList" class="post-grid">
+  {publishedPosts.map(post => {
+    const status = getPostStatus(post.data);
+
+    return (
+      <article
+        class="post-card"
+        data-title={post.data.title}
+        data-description={post.data.description}
+        data-tags={(post.data.tags || []).join(",")}
+      >
+        <a href={`/posts/${post.slug}/`}  >
+  {post.data.cover && (
+    <div class="post-card-cover">
+      <img src={post.data.cover} alt={post.data.title} />
+    </div>
+  )}
+
+
+          <h3 class="post-title">
+            {post.data.title}
+
+            {status === "new" && (
+              <span class="badge new">新</span>
+            )}
+
+            {status === "warn" && (
+              <span class="badge warn">注意</span>
+            )}
+
+            {status === "expired" && (
+              <span class="badge error">过期</span>
+            )}
+          </h3>
+
+          <p class="post-date">
+            {post.data.pubDate.toISOString().split('T')[0]}
+          </p>
+
+          <p class="post-desc">
+            {post.data.description}
+          </p>
+
+          {post.data.tags && (
+            <div class="post-tags">
+              {post.data.tags.map(tag => (
+                <span class="tag">{tag}</span>
+              ))}
+            </div>
+          )}
+
+        </a>
+      </article>
+    );
+  })}
+</div>
+
+
+</section>
 
 <script>
   const searchInput = document.getElementById('searchInput');
-  const postsList = document.getElementById('postsList');
-  const posts = Array.from(postsList.querySelectorAll('li.blog-post'));
+  const posts = Array.from(document.querySelectorAll('.post-card'));
 
   searchInput.addEventListener('input', () => {
     const query = searchInput.value.toLowerCase();
+
     posts.forEach(post => {
       const title = post.dataset.title?.toLowerCase() || '';
       const description = post.dataset.description?.toLowerCase() || '';

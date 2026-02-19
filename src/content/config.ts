@@ -12,6 +12,10 @@ const posts = defineCollection({
     summary: z.string().optional(),
     cover: z.string().optional(),
     draft: z.boolean().default(false),
+
+    // 生命周期系统
+    timeless: z.boolean().default(false),
+    validDays: z.number().optional(),
   })
 });
 

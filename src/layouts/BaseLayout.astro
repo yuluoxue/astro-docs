@@ -2,13 +2,14 @@
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import '../styles/global.css';
-import "../styles/global.css";
+
 
 const { pageTitle } = Astro.props;
 ---
 
 <html lang="zh-CN">
   <head>
+   
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>{pageTitle || "主页"}</title>
@@ -17,13 +18,18 @@ const { pageTitle } = Astro.props;
   <body>
     <Header />
 
+    
+      <!-- 阅读进度条 -->
+ <div id="reading-progress"></div>
+
     <main>
       <slot />
     </main>
 
     <Footer />
-<script is:inline src="/scripts/menu.js"></script>
 
+
+<script is:inline src="/scripts/menu.js"></script>
 
 
 
