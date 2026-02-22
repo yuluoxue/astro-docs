@@ -1,12 +1,14 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import { getPostStatus } from "../core/lifecycle";
+import { getPublishedPosts } from "../core/posts";
 
 const {
   frontmatter,
   prev,
   next,
-  headings
+  headings,
+  slug,
 } = Astro.props;
 
 
@@ -18,9 +20,31 @@ const status = getPostStatus({
 
 
 
+const allPosts = await getPublishedPosts();
+
+const currentSeries = frontmatter.series;
+
+let seriesPosts = [];
+let currentIndex = -1;
+
+if (currentSeries) {
+  seriesPosts = allPosts
+    .filter(p => p.data.series === currentSeries)
+    .sort((a, b) =>
+      (a.data.seriesOrder ?? 0) - (b.data.seriesOrder ?? 0)
+    );
+
+  currentIndex = seriesPosts.findIndex(
+    p => p.slug === slug
+  );
+}
 ---
 
+
+
+
 <BaseLayout pageTitle={frontmatter.title}>
+
 
 
 
@@ -48,15 +72,39 @@ const status = getPostStatus({
   <!-- 右侧正文 -->
   <article class="post-container">
 
+<div class="post-header">
+
+  {currentSeries && currentIndex >= 0 && (
+    <div class="series-progress">
+      <a href={`/series/${currentSeries}`}>
+        {frontmatter.seriesName ?? currentSeries}
+      </a>
+      <span class="series-divider"> · </span>
+      第 {currentIndex + 1} / {seriesPosts.length} 篇
+    </div>
+  )}
+
   <h1 class="post-title">
     {frontmatter.title}
   </h1>
+
+</div>
 
   {frontmatter.description && (
     <p class="post-description">
       {frontmatter.description}
     </p>
   )}
+
+{frontmatter.tags && (
+  <div class="post-tags">
+    {frontmatter.tags.map(tag => (
+      <a href={`/tags/${tag}`} class="tag-pill">
+        {tag}
+      </a>
+    ))}
+  </div>
+)}
 
   <div class="post-meta">
     {frontmatter.pubDate.toISOString().split('T')[0]}
@@ -83,11 +131,50 @@ const status = getPostStatus({
     </div>
   )}
 
-  <section class="post-content">
-   
 
+
+
+
+  <section class="post-content">
     <slot />
   </section>
+
+
+
+
+
+<div class="post-pagination">
+
+{prev && (
+  <a href={`/posts/${prev.slug}`} class="page-pill prev">
+    <span class="arrow">←</span>
+    <div>
+      <small>上一篇</small>
+      <strong>{prev.data.title}</strong>
+    </div>
+  </a>
+)}
+
+{frontmatter.series && (
+  <a href={`/series/${frontmatter.series}`} class="page-pill series">
+    <div>
+      <small>系列</small>
+      <strong>查看全部</strong>
+    </div>
+  </a>
+)}
+
+{next && (
+  <a href={`/posts/${next.slug}`} class="page-pill next">
+    <div>
+      <small>下一篇</small>
+      <strong>{next.data.title}</strong>
+    </div>
+    <span class="arrow">→</span>
+  </a>
+)}
+</div>
+
 
 </article>
  
@@ -195,33 +282,25 @@ const status = getPostStatus({
 .post-navigation a:hover {
   opacity: 0.7;
 }
-.post-pagination {
-  margin-top: 60px;
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-}
 
 .page-pill {
-  flex: 1;
-  min-width: 240px;
-
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
 
-  padding: 16px 20px;
-  border-radius: 999px;
+  padding: 18px 22px;
+  border-radius: 20px;
 
-  text-decoration: none;
   background: var(--container-bg);
   border: 1px solid var(--border);
 
   transition: all 0.2s ease;
-}
 
+    text-decoration: none;
+  color: var(--text-main);
+
+}
 .page-pill small {
   display: block;
   font-size: 12px;
@@ -236,8 +315,8 @@ const status = getPostStatus({
 }
 
 .page-pill .arrow {
-  font-size: 18px;
-  opacity: 0.6;
+  font-size: 22px;
+  opacity: 0.9;
 }
 
 .page-pill:hover {
@@ -300,16 +379,41 @@ const status = getPostStatus({
 }
 
 .toc-link {
-  text-decoration: none;
-  color: var(--text-main);
+  display: block;
   padding: 6px 12px;
   border-radius: 999px;
-  display: inline-block;
-  transition: background 0.2s ease;
+  text-decoration: none;
+
+  color: var(--text-secondary);
+
+  transition: all 0.2s ease;
 }
 
 .toc-link:hover {
-  background: rgba(61,169,252,0.15);
+  background: rgba(61,169,252,0.12);
+  color: var(--text-main);
+}
+
+/* 当前高亮 */
+
+
+.toc-link.active {
+  background: transparent;
+  color: hsl(45, 90%, 60%);
+  position: relative;
+}
+
+
+.toc-link.active::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 60%;
+  background: hsl(45, 90%, 60%);
+  border-radius: 2px;
 }
 
 /* 移动端隐藏目录 */
@@ -323,18 +427,8 @@ const status = getPostStatus({
   }
 }
 
-.toc-link {
-  display: block;
-  padding: 6px 12px;
-  border-radius: 999px;
-  color: var(--text-secondary);
-  transition: all 0.2s ease;
-}
 
-.toc-link.active {
-  background: red !important;
-  color: white !important;
-}
+
 
 .post-content h1,
 .post-content h2 {
@@ -362,8 +456,95 @@ const status = getPostStatus({
   margin: 0 auto;
 }
 
+.post-back {
+  margin-top: 40px;   /* 关键：拉开距离 */
 
+}
 
+.back-pill {
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.back-pill:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.page-pill .arrow,
+.back-pill .arrow {
+  color: currentColor;
+}
+
+.post-pagination {
+  margin-top: 60px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 20px;
+  align-items: stretch;
+}
+
+.series {
+  background: transparent;
+  border: 1px dashed var(--border);
+  text-align: center;
+}
+
+grid-template-columns: 1fr auto 1fr;
+
+.post-tags {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 16px 0 12px;
+}
+
+.tag-pill {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  background: var(--container-bg);
+  border: 1px solid var(--border);
+  text-decoration: none;
+  color: var(--text-secondary);
+  transition: 0.2s ease;
+}
+
+.tag-pill:hover {
+  border-color: var(--primary);
+  color: var(--text-main);
+}
+
+.series-progress {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 6px 14px;
+
+  border-radius: 999px;   /* 真正胶囊 */
+
+  background: var(--badge-bg);
+}
+
+.series-progress a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.series-progress a:hover {
+  text-decoration: underline;
+}
+
+.series-divider {
+  opacity: 0.5;
+  margin: 0 6px;
+}
 
 </style>
 

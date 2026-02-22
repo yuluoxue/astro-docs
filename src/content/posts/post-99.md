@@ -3,9 +3,9 @@
 # 基础信息（必须字段）
 # =========================
 
-title: "我的第6篇博客文章"        # 文章标题（用于页面标题和列表展示）
+title: "我的第99篇博客文章"        # 文章标题（用于页面标题和列表展示）
 description: "这篇文章会自动出现在列表中！"  # SEO 描述（简介，导读，技术档案大页显示  长导读）
-pubDate: 2026-02-13              # 发布时间（用于排序、时间显示）
+pubDate: 2026-02-15              # 发布时间（用于排序、时间显示）
 updatedDate: 2026-03-01          # 最后更新日期（可选，若存在可显示“最后更新于”）
 
 author: "Astro 学习者"           # 作者名（单人博客可考虑写死在 layout 中）
@@ -20,21 +20,21 @@ category: dev                    # 主分类（主页四个大块之一，例如
 tags:                             # 标签（用于多维度筛选，建议控制在核心标签池内）
   - astro
   - successes
-  - 测试2
+  - 测试9
 
         
 series: "lifecycle-system" # 系列名称（用于专题归档，可选）
 seriesName: "生命周期系统"
-seriesOrder: 2
+seriesOrder: 3
 # =========================
 # 展示控制
 # =========================
 
 featured: false                  # 是否推荐/置顶（true 会出现在精选区域）
-draft: false                     # 是否草稿（true 时构建可忽略该文章）
+draft: true                     # 是否草稿（true 时构建可忽略该文章）
 validDays: 1                     # 有效天数（用于判断是否显示 NEW 标记等）
 
-summary: "测试文章"               # 列表摘要（用于主页文章卡片简要介绍 短介绍）
+summary: "测试文章9"               # 列表摘要（用于主页文章卡片简要介绍 短介绍）
 cover: "https://docs.astro.build/default-og-image.png"  
                                   # 封面图地址（建议后期使用本地 WebP）
 
@@ -46,202 +46,3 @@ cover: "https://docs.astro.build/default-og-image.png"
 # validDays 若不用“新文章标记”功能，可删除
 # 单人博客可移除 author 字段，减少冗余
 ---
-
-这篇文章应该会与其他的博客文章一起显示，因为 `import.meta.glob()` 会返回一个包含所有文章的列表，以创建这个文章列表。# 这里就是正文
-
-
-## 生命周期系统
-
-正文...
-
-
-
-dgdsg
-
-
-afa
-
-
-
-faf
-
-
-sfaf
-
-
-a
-ffffff
-f
-f
-F
-
-Ff<br/>
-F<br/>
-A<br/>
-FAF<br/>
-AF<br/>
-A
-
-
-
-casca
-## 目录测试
-
-正文...
-fa
-cccc
-
-<br/>
-aaaa
-a
-a<br/>
-a
-<br/>
-
-a<br/>
-a<br/>
-a<br/>
-aa
-<br/>
-a
-<br/>
-aa
-
-
-## 生命周期系统3
-3
-
-6fsfsf
-fsfsef
-sfsefsesefs
-ggg
-
-ggggggggbbr 
-sef粉色Feared
-4335
-
-
-<br/>
-
-6
-
-
-dd
-d
-4
-ddd
-d
-d
-
-d
-dd
-d
-## 生命周期系统7
-d
-dd
-d
-d
-d
-## fff8
-dadad
-ada
-d
-d
-a
-d
-d
-d
-dwa
-d
-d
-aw
-dwa
-d
-a
-ada
-dad
-ada
-
-d
-d
-d
-d
-d
-d
-d
-d
-d
-d
-d
-d
-d
-d
-d
-d
-d
-d
-d
-d
-d
-d
-d
-d
-d
-d
-d
-d
-d
-d
-d
-d
-d
-
-d
-d
-d
-d
-d
-d
-
-
-d
-
-d
-
-d
-d
-
-d
-d
-d
-
-d
-d
-d
-
-d
-d
-
-d
-
-d
-d
-
-
-d
-
-d
-d
-d
-
-d
-
-d
-d
-d
-
-d 
-d
-ada
-da
-d

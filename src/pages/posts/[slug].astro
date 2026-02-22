@@ -1,9 +1,10 @@
 ---
 import { getCollection } from "astro:content";
 import MarkdownPostLayout from "../../layouts/MarkdownPostLayout.astro";
+import { getPublishedPosts } from "../../core/posts";
 
 export async function getStaticPaths() {
-  const posts = await getCollection("posts");
+  const posts = await getPublishedPosts();
 
   const publishedPosts = posts
     .filter(post => !post.data.draft)
@@ -31,6 +32,25 @@ const h2Headings = headings.filter(h => h.depth === 2);
 const rawContent = post.body || "";
 const wordCount = rawContent.length;
 const readingTime = Math.max(1, Math.ceil(wordCount / 450));
+
+const allPosts = await getPublishedPosts();
+
+const currentSeries = post.data.series;
+
+let seriesPosts = [];
+let currentIndex = -1;
+
+if (currentSeries) {
+  seriesPosts = allPosts
+    .filter(p => p.data.series === currentSeries)
+    .sort((a, b) =>
+      (a.data.seriesOrder ?? 0) - (b.data.seriesOrder ?? 0)
+    );
+
+  currentIndex = seriesPosts.findIndex(
+    p => p.slug === post.slug
+  );
+}
 ---
 
 <MarkdownPostLayout
@@ -40,6 +60,7 @@ const readingTime = Math.max(1, Math.ceil(wordCount / 450));
   prev={prev}
   next={next}
   headings={h2Headings}
+  slug={post.slug}
 >
   <Content />
 </MarkdownPostLayout>

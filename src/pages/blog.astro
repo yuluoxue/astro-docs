@@ -2,11 +2,11 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from "astro:content";
 import { getPostStatus } from "../core/lifecycle";
-
+import { getPublishedPosts } from "../core/posts";
 const pageTitle = "技术档案";
 
 /* 读取文章集合 */
-const posts = await getCollection("posts");
+const posts = await getPublishedPosts();
 
 /* 过滤草稿 + 排序 */
 const publishedPosts = posts

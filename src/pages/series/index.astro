@@ -1,0 +1,142 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getAllSeriesWithMeta } from "../../core/posts";
+
+const seriesList = await getAllSeriesWithMeta();
+---
+
+<BaseLayout pageTitle="系列">
+
+  <section class="series-container">
+
+    <header class="series-header">
+      <h1 class="series-page-title">系列专栏</h1>
+      <p class="series-page-desc">
+        系统化的学习路径与主题集合
+      </p>
+    </header>
+
+    <div class="series-grid">
+      {seriesList.map(series => (
+        <a href={`/series/${series.slug}`} class="series-card">
+          <div class="series-card-content">
+            <h2 class="series-name">{series.name}</h2>
+            <p class="series-count">{series.count} 篇文章</p>
+          </div>
+          <span class="series-arrow">›</span>
+        </a>
+      ))}
+    </div>
+
+    
+  </section>
+
+  
+</BaseLayout>
+
+<style>
+.series-container {
+  max-width: 1100px;
+  margin: 80px auto;
+  padding: 0 20px;
+  overflow: visible;
+}
+
+.series-header {
+  padding: 40px 56px;
+  border-radius: 28px;
+
+  background: var(--container-bg);
+
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.04),
+    0 10px 30px rgba(0,0,0,0.08);
+
+  margin-bottom: 90px;
+}
+[data-theme="dark"] .series-header {
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.06),
+    0 16px 40px rgba(0,0,0,0.5);
+}
+
+.series-page-title {
+  font-size: 2.2rem;
+  margin-bottom: 12px;
+}
+
+.series-page-desc {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+/* 网格布局 */
+.series-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 28px;
+}
+
+/* 卡片 */
+.series-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 28px 30px;
+  border-radius: 22px;
+
+  background: var(--container-bg);
+  border: 1px solid var(--border);
+
+  text-decoration: none;
+  transition: all 0.25s ease;
+  border-radius: 24px; /* 再大一点 */
+}
+
+.series-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--primary);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.18);
+}
+
+.series-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.series-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.series-count {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.series-arrow {
+  font-size: 32px;
+  opacity: 0.5;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.series-card:hover .series-arrow {
+  transform: translateX(6px);
+  opacity: 0.85;
+}
+
+.series-header {
+  margin-bottom: 60px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.series-header {
+  margin: 0 0 80px 0;
+}
+
+
+</style>

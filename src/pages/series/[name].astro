@@ -1,0 +1,150 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getPublishedPosts } from "../../core/posts";
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+
+  const seriesNames = [
+    ...new Set(
+      posts
+        .filter(p => p.data.series)
+        .map(p => p.data.series)
+    )
+  ];
+
+  return seriesNames.map(name => ({
+    params: { name }
+  }));
+}
+
+const { name } = Astro.params;
+
+const allPosts = await getPublishedPosts();
+
+const posts = allPosts
+  .filter(p => p.data.series === name)
+  .sort((a, b) =>
+    (a.data.seriesOrder ?? 0) - (b.data.seriesOrder ?? 0)
+  );
+
+const seriesDisplayName =
+  posts[0]?.data.seriesName ?? name;
+---
+
+<BaseLayout pageTitle={`系列 - ${seriesDisplayName}`}>
+
+  <section class="series-container">
+
+<h1 class="series-page-title">
+  {seriesDisplayName}
+</h1>
+
+  <p class="series-meta">
+    本系列共 {posts.length} 篇文章
+  </p>
+
+<div class="series-list">
+  {posts.map((post, index) => (
+    <a class="series-card" href={`/posts/${post.slug}`}>
+      <div class="series-left">
+        <div class="series-index">
+          {index + 1}
+        </div>
+        <span class="series-item-title">
+          {post.data.title}
+        </span>
+      </div>
+      <span class="series-arrow">›</span>
+    </a>
+  ))}
+</div>
+
+
+</section>
+<style>
+
+  .series-container {
+  max-width: 900px;
+  margin: 60px auto;
+}
+
+.series-page-title {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.series-meta {
+  color: var(--text-secondary);
+  margin-bottom: 40px;
+}
+
+/* 列表结构 */
+.series-list {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* 卡片 */
+.series-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 24px 28px;
+  border-radius: 20px;
+
+  background: var(--container-bg);
+  border: 1px solid var(--border);
+
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.series-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--primary);
+  box-shadow: 0 14px 36px rgba(0,0,0,0.18);
+}
+
+/* 左侧结构 */
+.series-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* 数字块 */
+.series-index {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+
+  background: rgba(59,130,246,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: bold;
+  color: var(--primary);
+}
+
+/* 标题 */
+.series-item-title {
+  font-size: 1.05rem;
+  color: var(--text-main);
+  font-weight: 500;
+}
+
+/* 箭头 */
+.series-arrow {
+  font-size: 28px;
+  opacity: 0.6;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.series-card:hover .series-arrow {
+  transform: translateX(6px);
+  opacity: 0.9;
+}

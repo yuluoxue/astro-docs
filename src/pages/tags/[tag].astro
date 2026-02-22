@@ -2,9 +2,10 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from "astro:content";
 import { getPostStatus } from "../../core/lifecycle";
+import { getPublishedPosts } from "../../core/posts";
 
 export async function getStaticPaths() {
-  const posts = await getCollection("posts");
+  const posts = await getPublishedPosts();
 
   const tags = [
     ...new Set(
@@ -20,7 +21,7 @@ export async function getStaticPaths() {
 const { tag } = Astro.params;
 
 /* 获取文章 */
-const posts = await getCollection("posts");
+const posts = await getPublishedPosts();
 
 /* 过滤草稿 + 当前标签 */
 const filteredPosts = posts

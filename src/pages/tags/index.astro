@@ -1,9 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from "astro:content";
+import { getPublishedPosts } from "../../core/posts";
 
 /* 获取所有文章 */
-const posts = await getCollection("posts");
+const posts = await getPublishedPosts();
 
 /* 统计标签 */
 const tagMap = new Map<string, number>();
@@ -26,9 +27,9 @@ const max = Math.max(...counts);
 const min = Math.min(...counts);
 ---
 
-<BaseLayout pageTitle="标签索引">
+<BaseLayout pageTitle="分类索引">
 
-<h1>标签索引</h1>
+<h1>分类索引</h1>
 
 <div class="tag-cloud">
   {sortedTags.map(([tag, count]) => {

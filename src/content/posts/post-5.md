@@ -11,7 +11,9 @@ featured: false
 draft: false
 summary: "测试文章"
 cover: "https://docs.astro.build/default-og-image.png"
-series: "生命周期系统"
+series: "lifecycle-system" # 系列名称（用于专题归档，可选）
+seriesName: "生命周期系统"
+seriesOrder: 1
 ---
 这篇文章应该会与其他的博客文章一起显示，因为 `import.meta.glob()` 会返回一个包含所有文章的列表，以创建这个文章列表。# 这里就是正文 特殊土《。
 
